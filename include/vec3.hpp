@@ -1,7 +1,10 @@
 #pragma once
 
+#include <bit>
 #include <cmath>
 #include <fstream>
+
+#include "utils.hpp"
 
 class vec3 {
    public:
@@ -38,6 +41,14 @@ class vec3 {
     float length() const {
         return std::sqrt(length_squared());
     }
+
+    inline static vec3 random() {
+        return vec3(utils::randomFloat(), utils::randomFloat(), utils::randomFloat());
+    }
+
+    inline static vec3 random(int aMin, int bMax) {
+        return vec3(utils::randomFloat(aMin, bMax), utils::randomFloat(aMin, bMax), utils::randomFloat(aMin, bMax));
+    }
 };
 
 inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
@@ -73,8 +84,43 @@ inline vec3 cross(const vec3 &v1, const vec3 &v2) {
     return vec3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
 }
 
-inline vec3 unitVector(const vec3 &v) {
+inline vec3 normalize(const vec3 &v) {
     return v / v.length();
+}
+
+inline vec3 randomUnitVector() {
+    while (true) {
+        vec3 vec = vec3::random(-1.0f, 1.0f);
+        float len = vec.length_squared();
+        if (1e-38 < len && len <= 1.0f) {
+            return vec / std::sqrt(len);
+        }
+    }
+}
+
+inline vec3 randomOnHemisphere(const vec3 &normal) {
+    vec3 vecOnUnitHemishpere = randomUnitVector();
+    if (dot(vecOnUnitHemishpere, normal) > 0.0f) {
+        return vecOnUnitHemishpere;
+    }
+    return -vecOnUnitHemishpere;
+}
+
+inline vec3 reflect(const vec3 &v, const vec3 &n) {
+    return v - 2 * dot(v, n) * n;
+}
+
+inline bool nearZero(const vec3 &v, float epsilon = 1e-8) {
+    return std::fabs(v.x) < epsilon && std::fabs(v.y) < epsilon && std::fabs(v.z) < epsilon;
+}
+
+inline bool isZero(const vec3 &v) {
+    int32_t xBits, yBits, zBits;
+    xBits = std::bit_cast<int32_t>(std::fabs(v.x));
+    yBits = std::bit_cast<int32_t>(std::fabs(v.y));
+    zBits = std::bit_cast<int32_t>(std::fabs(v.z));
+    int maxUlp = 4;  // maximum steps going from 0.0 to 1.0
+    return xBits <= maxUlp && yBits <= maxUlp && zBits <= maxUlp;
 }
 
 using point3 = vec3;
