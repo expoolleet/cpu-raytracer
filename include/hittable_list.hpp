@@ -30,15 +30,15 @@ class HittableList : public Hittable {
         return m_objects;
     }
 
-    bool hit(const ray &r, interval rayInterval, HitInfo &info) const override {
+    bool hit(const ray &r, interval rayInterval, HitInfo &hit) const override {
         bool hitAnything = false;
-        HitInfo tempInfo;
+        HitInfo tempHit;
         float closest = rayInterval.getMax();
-        for (auto &object : m_objects) {
-            if (object->hit(r, interval(rayInterval.getMin(), closest), tempInfo)) {
+        for (const auto &object : m_objects) {
+            if (object->hit(r, interval(rayInterval.getMin(), closest), tempHit)) {
                 hitAnything = true;
-                closest = info.t;
-                info = tempInfo;
+                closest = tempHit.t;
+                hit = tempHit;
             }
         }
 

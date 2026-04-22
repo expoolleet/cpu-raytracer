@@ -14,7 +14,7 @@ class Sphere : public Hittable {
     Sphere(point3 center, float radius, std::shared_ptr<Material> mat) : m_center(center), m_radius(radius), m_material(mat) {}
     Sphere() {}
 
-    bool hit(const ray &r, interval rayInterval, HitInfo &hitInfo) const override {
+    bool hit(const ray &r, interval rayInterval, HitInfo &hit) const override {
         point3 oc = m_center - r.origin();
         float a = r.direction().length_squared();
         float h = dot(r.direction(), oc);
@@ -33,11 +33,11 @@ class Sphere : public Hittable {
             }
         }
 
-        hitInfo.t = root;
-        hitInfo.point = r.at(root);
-        hitInfo.material = m_material;
-        vec3 outwardNormal = (hitInfo.point - m_center) / m_radius;
-        hitInfo.setFaceNormal(r, outwardNormal);
+        hit.t = root;
+        hit.point = r.at(root);
+        hit.material = m_material;
+        vec3 outwardNormal = (hit.point - m_center) / m_radius;
+        hit.setFaceNormal(r, outwardNormal);
         return true;
     }
 

@@ -43,11 +43,11 @@ class vec3 {
     }
 
     inline static vec3 random() {
-        return vec3(utils::randomFloat(), utils::randomFloat(), utils::randomFloat());
+        return vec3(utils::random(), utils::random(), utils::random());
     }
 
-    inline static vec3 random(int aMin, int bMax) {
-        return vec3(utils::randomFloat(aMin, bMax), utils::randomFloat(aMin, bMax), utils::randomFloat(aMin, bMax));
+    inline static vec3 random(float aMin, float bMax) {
+        return vec3(utils::random(aMin, bMax), utils::random(aMin, bMax), utils::random(aMin, bMax));
     }
 };
 
@@ -110,10 +110,10 @@ inline vec3 reflect(const vec3 &v, const vec3 &n) {
     return v - 2 * dot(v, n) * n;
 }
 
-inline vec3 refract(const vec3 &v, const vec3 &n, float indexOut, float indexIn) {
+inline vec3 refract(const vec3 &v, const vec3 &n, float refractionIndex) {
     float cosTheta = std::fmin(dot(-v, n), 1.0f);
-    vec3 vPerpendicular = (indexOut / indexIn) * (v + cosTheta * n);
-    vec3 vParallel = -std::sqrtf(std::fabs(1 - vPerpendicular.length_squared())) * n;
+    vec3 vPerpendicular = refractionIndex * (v + cosTheta * n);
+    vec3 vParallel = -std::sqrtf(std::fabs(1.0f - vPerpendicular.length_squared())) * n;
     return vPerpendicular + vParallel;
 }
 

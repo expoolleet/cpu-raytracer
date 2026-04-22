@@ -12,13 +12,13 @@ float degToRad(float deg) {
     return deg * pi / 180.0f;
 }
 
-float randomFloat() {
+float random() {
     static std::mt19937 randEngine;
     static std::uniform_real_distribution<float> randDist(0.0f, 1.0f);
     return randDist(randEngine);
 }
 
-float randomFloat(float aMin, float bMax) {
-    return aMin + (bMax - aMin) * randomFloat();
+float random(float aMin, float bMax) {
+    return aMin + (bMax - aMin) * random();
 }
 };  // namespace utils

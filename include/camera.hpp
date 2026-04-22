@@ -42,7 +42,7 @@ class Camera {
     }
 
     vec3 _getSampleSquare() {
-        return {utils::randomFloat() - 0.5f, utils::randomFloat() - 0.5f, 0.0f};
+        return {utils::random() - 0.5f, utils::random() - 0.5f, 0.0f};
     }
 
     ray _getRay(int i, int j) {

@@ -13,15 +13,17 @@ using std::make_shared;
 int main(int argc, char *argv[]) {
     HittableList world;
 
-    auto materialGround = make_shared<Lambertian>(color3(0.8f, 0.8f, 0.0f));
-    auto materialCenter = make_shared<Lambertian>(color3(0.1f, 0.2f, 0.5f));
-    auto materialLeft = make_shared<Dialectric>(color3(1.0f, 1.0f, 1.0f), 1.5f);
-    auto materialRight = make_shared<Metal>(color3(0.8f, 0.6f, 0.2f), 0.3f);
+    auto materialLambertian1 = make_shared<Lambertian>(color3(0.8f, 0.8f, 0.0f));
+    auto materialLambertian2 = make_shared<Lambertian>(color3(0.1f, 0.2f, 0.5f));
+    auto materialDialectric1 = make_shared<Dialectric>(color3(1.0f, 1.0f, 1.0f), 1.5f);
+    auto materialDialectric2 = make_shared<Dialectric>(color3(1.0f, 1.0f, 1.0f), 1.0f / 1.5f);
+    auto materialMetal1 = make_shared<Metal>(color3(0.8f, 0.6f, 0.2f), 0.3f);
 
-    world.add(make_shared<Sphere>(point3(0.0f, 0.0f, -1.2f), 0.5f, materialCenter));
-    world.add(make_shared<Sphere>(point3(-1.0f, 0.0f, -1.0f), 0.5f, materialLeft));
-    world.add(make_shared<Sphere>(point3(1.0f, 0.0f, -1.0f), 0.5f, materialRight));
-    world.add(make_shared<Sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f, materialGround));
+    world.add(make_shared<Sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f, materialLambertian1));
+    world.add(make_shared<Sphere>(point3(0.0f, 0.0f, -1.2f), 0.5f, materialLambertian2));
+    world.add(make_shared<Sphere>(point3(1.0f, 0.0f, -1.0f), 0.5f, materialMetal1));
+    world.add(make_shared<Sphere>(point3(-1.0f, 0.0f, -1.0f), 0.4f, materialDialectric2));
+    world.add(make_shared<Sphere>(point3(-1.0f, 0.0f, -1.0f), 0.5f, materialDialectric1));
 
     Camera camera;
     camera.position = point3(0.0f, 0.0f, 0.0f);
