@@ -110,6 +110,13 @@ inline vec3 reflect(const vec3 &v, const vec3 &n) {
     return v - 2 * dot(v, n) * n;
 }
 
+inline vec3 refract(const vec3 &v, const vec3 &n, float indexOut, float indexIn) {
+    float cosTheta = std::fmin(dot(-v, n), 1.0f);
+    vec3 vPerpendicular = (indexOut / indexIn) * (v + cosTheta * n);
+    vec3 vParallel = -std::sqrtf(std::fabs(1 - vPerpendicular.length_squared())) * n;
+    return vPerpendicular + vParallel;
+}
+
 inline bool nearZero(const vec3 &v, float epsilon = 1e-8) {
     return std::fabs(v.x) < epsilon && std::fabs(v.y) < epsilon && std::fabs(v.z) < epsilon;
 }
