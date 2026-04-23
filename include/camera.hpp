@@ -10,16 +10,20 @@
 class Camera {
    private:
     size_t m_imageHeight;
-    float m_focalLength;
+
     float m_viewportHeight;
     float m_viewportWidth;
+    float m_pixelSampleScale;
+
     vec3 m_viewportU;
     vec3 m_viewportV;
-    point3 m_viewportTopLeftCorner;
     vec3 m_viewport_dU;
     vec3 m_viewport_dV;
+    vec3 m_defocusDiskU;
+    vec3 m_defocusDiskV;
+
     point3 m_topLeftPixel;
-    float m_pixelSampleScale;
+    point3 m_viewportTopLeftCorner;
 
     color3 _getRayColor(const ray &r, int depth, const HittableList &world) {
         if (depth <= 0) {
@@ -41,48 +45,68 @@ class Camera {
         return a * color3(0.5f, 0.7f, 1.0f) + (1.0f - a) * color3(1.0f, 1.0f, 1.0f);
     }
 
-    vec3 _getSampleSquare() {
+    vec3 _sampleSquare() {
         return {utils::random() - 0.5f, utils::random() - 0.5f, 0.0f};
     }
 
+    vec3 _sampleDisk() {
+        vec3 v = randomUnitVecOnDisk();
+        return position + v.x * m_defocusDiskU + v.y * m_defocusDiskV;
+    }
+
     ray _getRay(int i, int j) {
-        vec3 offset = _getSampleSquare();
+        vec3 offset = _sampleSquare();
         point3 pixelCenter = m_topLeftPixel + ((i + offset.x) * m_viewport_dU) + ((j + offset.y) * m_viewport_dV);
-        vec3 direction = pixelCenter - position;
-        ray cameraRay{position, direction};
-        return cameraRay;
+        vec3 rayOrigin = defocusAngle <= 0.0f ? position : _sampleDisk();
+        vec3 rayDirection = pixelCenter - rayOrigin;
+        return {rayOrigin, rayDirection};
     }
 
    public:
     int imageWidth = 100;
-    float aspectRatio = 1.0f;
     int sampleCount = 8;
     int raysMaxDepth = 10;
-    point3 position = point3(0.0f);
-    point3 lookAt = point3(0.0f, 0.0f, -1.0f);
-    vec3 vUp = vec3(0.0f, 1.0f, 0.0f);
+
     float vFov = 60.0f;
+    float aspectRatio = 1.0f;
+    float focusDistance = 10.0f;
+    float defocusAngle = 0.0f;
+
+    vec3 vUp = vec3(0.0f, 1.0f, 0.0f);
+
+    point3 lookAt = point3(0.0f, 0.0f, -1.0f);
+    point3 position = point3(0.0f);
 
     Camera() {}
 
     void initialize() {
+        m_pixelSampleScale = 1.0f / sampleCount;
+
         m_imageHeight = static_cast<size_t>(imageWidth / aspectRatio);
         m_imageHeight = m_imageHeight > 1 ? m_imageHeight : 1;
+
         float theta = utils::degToRad(vFov);
         float h = std::tanf(theta / 2.0f);
-        m_focalLength = (position - lookAt).length();
         vec3 w = normalize(position - lookAt);
         vec3 u = normalize(cross(vUp, w));
         vec3 v = cross(w, u);
-        m_viewportHeight = 2.0f * h * m_focalLength;
+
+        m_viewportHeight = 2.0f * h * focusDistance;
         m_viewportWidth = m_viewportHeight * static_cast<float>(imageWidth) / m_imageHeight;
+
         m_viewportU = m_viewportWidth * u;
         m_viewportV = m_viewportHeight * (-v);
-        m_viewportTopLeftCorner = position - m_focalLength * w - 0.5f * (m_viewportU + m_viewportV);
+
+        m_viewportTopLeftCorner = position - focusDistance * w - 0.5f * (m_viewportU + m_viewportV);
+
         m_viewport_dU = m_viewportU / imageWidth;
         m_viewport_dV = m_viewportV / m_imageHeight;
+
         m_topLeftPixel = m_viewportTopLeftCorner + 0.5f * (m_viewport_dU + m_viewport_dV);
-        m_pixelSampleScale = 1.0f / sampleCount;
+
+        float defocusRadius = focusDistance * std::tanf(utils::degToRad(defocusAngle / 2.0f));
+        m_defocusDiskU = defocusRadius * u;
+        m_defocusDiskV = defocusRadius * v;
     }
 
     void render(const HittableList &world) {

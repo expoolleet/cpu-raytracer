@@ -106,6 +106,14 @@ inline vec3 randomUnitVecOnHemisphere(const vec3 &normal) {
     return -vecOnUnitHemishpere;
 }
 
+inline vec3 randomUnitVecOnDisk() {
+    while (true) {
+        vec3 randVec = vec3(utils::random(-1.0f, 1.0f), utils::random(-1.0f, 1.0f), 0.0f);
+        if (randVec.length_squared() < 1.0f)
+            return randVec;
+    }
+}
+
 inline vec3 reflect(const vec3 &v, const vec3 &n) {
     return v - 2 * dot(v, n) * n;
 }
