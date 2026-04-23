@@ -10,7 +10,7 @@ class Metal : public Material {
 
     bool scattered(const ray &rayIn, HitInfo &hit, color3 &attenuation, ray &rayOut) const override {
         vec3 reflectedVec = reflect(rayIn.direction(), hit.normal);
-        reflectedVec = normalize(reflectedVec) + (m_roughness * randomUnitVector());
+        reflectedVec = normalize(reflectedVec) + (m_roughness * randomUnitVec());
         rayOut = ray(hit.point, reflectedVec);
         attenuation = m_albedo;
         return dot(reflectedVec, hit.normal) > 0.0f;

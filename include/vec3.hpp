@@ -88,7 +88,7 @@ inline vec3 normalize(const vec3 &v) {
     return v / v.length();
 }
 
-inline vec3 randomUnitVector() {
+inline vec3 randomUnitVec() {
     while (true) {
         vec3 vec = vec3::random(-1.0f, 1.0f);
         float len = vec.length_squared();
@@ -98,8 +98,8 @@ inline vec3 randomUnitVector() {
     }
 }
 
-inline vec3 randomOnHemisphere(const vec3 &normal) {
-    vec3 vecOnUnitHemishpere = randomUnitVector();
+inline vec3 randomUnitVecOnHemisphere(const vec3 &normal) {
+    vec3 vecOnUnitHemishpere = randomUnitVec();
     if (dot(vecOnUnitHemishpere, normal) > 0.0f) {
         return vecOnUnitHemishpere;
     }

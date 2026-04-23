@@ -6,6 +6,7 @@
 #include "lambertian.hpp"
 #include "metal.hpp"
 #include "sphere.hpp"
+#include "utils.hpp"
 #include "vec3.hpp"
 
 using std::make_shared;
@@ -26,9 +27,11 @@ int main(int argc, char *argv[]) {
     world.add(make_shared<Sphere>(point3(-1.0f, 0.0f, -1.0f), 0.5f, materialDialectric1));
 
     Camera camera;
-    camera.position = point3(0.0f, 0.0f, 0.0f);
+    camera.position = point3(-2.0f, 0.0f, 1.0f);
+    camera.lookAt = point3(0.0f, 0.0f, -1.0f);
+    camera.vUp = vec3(0.0f, 1.0f, 0.0f);
     camera.aspectRatio = 16.0f / 9.0f;
-
+    camera.vFov = 30.0f;
     if (argc > 3) {
         camera.imageWidth = atoi(argv[1]);
         camera.sampleCount = atoi(argv[2]);

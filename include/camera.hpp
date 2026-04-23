@@ -59,18 +59,26 @@ class Camera {
     int sampleCount = 8;
     int raysMaxDepth = 10;
     point3 position = point3(0.0f);
+    point3 lookAt = point3(0.0f, 0.0f, -1.0f);
+    vec3 vUp = vec3(0.0f, 1.0f, 0.0f);
+    float vFov = 60.0f;
 
     Camera() {}
 
     void initialize() {
         m_imageHeight = static_cast<size_t>(imageWidth / aspectRatio);
         m_imageHeight = m_imageHeight > 1 ? m_imageHeight : 1;
-        m_focalLength = 1.0f;
-        m_viewportHeight = 2.0f;
+        float theta = utils::degToRad(vFov);
+        float h = std::tanf(theta / 2.0f);
+        m_focalLength = (position - lookAt).length();
+        vec3 w = normalize(position - lookAt);
+        vec3 u = normalize(cross(vUp, w));
+        vec3 v = cross(w, u);
+        m_viewportHeight = 2.0f * h * m_focalLength;
         m_viewportWidth = m_viewportHeight * static_cast<float>(imageWidth) / m_imageHeight;
-        m_viewportU = vec3(m_viewportWidth, 0.0f, 0.0f);
-        m_viewportV = vec3(0.0f, -m_viewportHeight, 0.0f);
-        m_viewportTopLeftCorner = position - vec3(0.0f, 0.0f, m_focalLength) - 0.5f * (m_viewportU + m_viewportV);
+        m_viewportU = m_viewportWidth * u;
+        m_viewportV = m_viewportHeight * (-v);
+        m_viewportTopLeftCorner = position - m_focalLength * w - 0.5f * (m_viewportU + m_viewportV);
         m_viewport_dU = m_viewportU / imageWidth;
         m_viewport_dV = m_viewportV / m_imageHeight;
         m_topLeftPixel = m_viewportTopLeftCorner + 0.5f * (m_viewport_dU + m_viewport_dV);

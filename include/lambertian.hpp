@@ -6,7 +6,7 @@ class Lambertian : public Material {
     Lambertian(color3 albedo) : Material(albedo) {}
 
     bool scattered(const ray &rayIn, HitInfo &hit, color3 &attenuation, ray &scatteredRay) const override {
-        vec3 scatterDirection = hit.normal + randomUnitVector();
+        vec3 scatterDirection = hit.normal + randomUnitVec();
         if (nearZero(scatterDirection)) {
             scatterDirection = hit.normal;
         }
